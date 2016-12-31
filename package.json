@@ -1,0 +1,22 @@
+{
+  "name": "trello-dependency",
+  "version": "0.0.1",
+  "description": "A Trello power-up to visualise and manage dependencies between cards",
+  "main": "js/index.js",
+  "scripts": {
+    "test": "eslint js/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/piemonkey/trello-dependency.git"
+  },
+  "author": "piemonkey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/piemonkey/trello-dependency/issues"
+  },
+  "homepage": "https://github.com/piemonkey/trello-dependency#readme",
+  "devDependencies": {
+    "eslint": "^3.12.2"
+  }
+}
