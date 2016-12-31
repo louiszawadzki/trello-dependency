@@ -6,6 +6,7 @@
   },
   "author": "piemonkey",
   "capabilities": [
+    "callback",
     "card-badges"
   ],
   "connectors": {
