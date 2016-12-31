@@ -1,0 +1,2 @@
+TrelloPowerUp.initialize({
+})

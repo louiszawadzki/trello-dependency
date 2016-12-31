@@ -1,0 +1,16 @@
+{
+  "name": "Trello Dependency",
+  "details": "A Trello power-up to visualise and manage dependencies between cards",
+  "icon": {
+    "url": "./images/logo.svg"
+  },
+  "author": "piemonkey",
+  "capabilities": [
+    "card-badges"
+  ],
+  "connectors": {
+    "iframe": {
+      "url": "./index.html"
+    }
+  }
+}
