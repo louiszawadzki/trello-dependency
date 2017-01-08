@@ -39,9 +39,14 @@ TrelloPowerUp.initialize({
         cards[cardId].labels = currentLabels
 
         return [{
-          text: children[cards[cardId].number] ? '- / ' + children[cards[cardId].number].length: cards[cardId].number,
-          icon: './images/logo.svg',
-          color: 'green',
+          dynamic: function() {
+            return {
+              text: children[cards[cardId].number] ? '- / ' + children[cards[cardId].number].length: cards[cardId].number,
+              icon: './images/logo.svg',
+              color: 'green',
+              refresh: 10,
+            }
+          },
         }]
       })
   },
