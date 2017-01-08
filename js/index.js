@@ -35,13 +35,20 @@ TrelloPowerUp.initialize({
         var oldLabels = cards[cardId].labels
         var currentLabels = card.labels.map(function(label) {return label.name})
         currentLabels
-          .filter(function(label) {return oldLabels.indexOf(label) === -1})
           .map(function(label) {return cardLabelRegex.exec(label)})
           .forEach(function(match) {
             if (match && match[1]) {
               var cardNo = match[1]
-              var newChild = {id: cardId, done: lists[card.idList].done}
-              children[cardNo] = children[cardNo] ? children[cardNo].concat([newChild]) : [newChild]
+              if (oldLabels.indexOf(match.input) === -1) {
+                var newChild = {id: cardId, done: lists[card.idList].done}
+                children[cardNo] = children[cardNo] ? children[cardNo].concat([newChild]) : [newChild]
+              } else {
+                children[cardNo].forEach(function(child) {
+                  if (child.id === cardId) {
+                    child.done = lists[card.idList].done
+                  }
+                })
+              }
             }
           })
         oldLabels
