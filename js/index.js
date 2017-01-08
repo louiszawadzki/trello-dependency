@@ -1,15 +1,29 @@
 'use strict'
 
 var cardLabelRegex = /^#? ?(\d+)$/
+var doneListRegex = /(?:Done|done|DONE)/
 
 var cards = {}
 var children = {}
+var lists = {}
 
 TrelloPowerUp.initialize({
   'card-badges': function(t) {
     var cardId = ''
-    return t.card('id', 'url', 'labels')
+    return t.card('id', 'url', 'labels', 'idList')
       .then(function(card) {
+        // Add whether the list counts as done to the map of lists if it's not already there
+        if (!lists[card.idList]) {
+          lists[card.idList] = {done: false}
+          // Update whether done by checking list name
+          t.list('name')
+            .then(function(list) {
+              if (doneListRegex.test(list.name)) {
+                lists[card.idList].done = true
+              }
+            })
+        }
+
         cardId = card.id
         if (!cards[cardId]) {
           cards[cardId] = {
@@ -25,7 +39,9 @@ TrelloPowerUp.initialize({
           .map(function(label) {return cardLabelRegex.exec(label)})
           .forEach(function(match) {
             if (match && match[1]) {
-              children[match[1]] = children[match[1]] ? children[match[1]].concat([cardId]) : [cardId]
+              var cardNo = match[1]
+              var newChild = {id: cardId, done: lists[card.idList].done}
+              children[cardNo] = children[cardNo] ? children[cardNo].concat([newChild]) : [newChild]
             }
           })
         oldLabels
@@ -33,15 +49,22 @@ TrelloPowerUp.initialize({
           .map(function(label) {return cardLabelRegex.exec(label)})
           .forEach(function(match) {
             if (match && match[1]) {
-              children[match[1]] = children[match[1]].filter(function(id) {return id !== cardId})
+              var cardNo = match[1]
+              children[cardNo] = children[cardNo].filter(function(child) {return child.id !== cardId})
             }
           })
         cards[cardId].labels = currentLabels
 
         return [{
           dynamic: function() {
+            var cardNo = cards[cardId].number
+            var text = cardNo
+            if (children[cardNo]) {
+              text = children[cardNo].filter(function(child) {return child.done}).length
+                + ' / ' + children[cardNo].length
+            }
             return {
-              text: children[cards[cardId].number] ? '- / ' + children[cards[cardId].number].length: cards[cardId].number,
+              text: text,
               icon: './images/logo.svg',
               color: 'green',
               refresh: 10,
