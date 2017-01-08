@@ -4,6 +4,7 @@ var cardLabelRegex = /^#? ?(\d+)$/
 var doneListRegex = /(?:Done|done|DONE)/
 
 var cards = {}
+var cardNumIdMap = {}
 var children = {}
 var lists = {}
 
@@ -15,7 +16,7 @@ TrelloPowerUp.initialize({
       return null
     }
     return Promise.all([
-      t.card('id', 'url', 'labels', 'idList'),
+      t.card('id', 'url', 'labels', 'idList', 'name'),
       t.list('name'),
     ])
       .then(function(context) {
@@ -26,12 +27,15 @@ TrelloPowerUp.initialize({
 
         cardId = card.id
         if (!cards[cardId]) {
+          var cardNumber = card.url.slice(card.url.lastIndexOf('/') + 1, card.url.indexOf('-'))
           cards[cardId] = {
             t: t,
-            number: card.url.slice(card.url.lastIndexOf('/') + 1, card.url.indexOf('-')),
+            number: cardNumber,
             labels: [],
           }
+          cardNumIdMap[cardNumber] = cardId
         }
+        cards[cardId].name = card.name
 
         var oldLabels = cards[cardId].labels
         var currentLabels = card.labels.map(function(label) {return label.name})
@@ -50,6 +54,10 @@ TrelloPowerUp.initialize({
                   }
                 })
               }
+
+              if (cardNumIdMap[cardNo]) {
+                cards[cardId].parent = cards[cardNumIdMap[cardNo]].name
+              }
             }
           })
         oldLabels
@@ -66,17 +74,29 @@ TrelloPowerUp.initialize({
         return [{
           dynamic: function() {
             var cardNo = cards[cardId].number
-            var text = cardNo
-            if (children[cardNo]) {
-              text = children[cardNo].filter(function(child) {return child.done}).length
-                + ' / ' + children[cardNo].length
-            }
-            return {
-              text: text,
+            var badge = {
+              text: cardNo,
               icon: './images/logo.svg',
-              color: 'green',
               refresh: 10,
             }
+            if (cards[cardId].parent) {
+              badge = {
+                text: cards[cardId].parent,
+                icon: './images/logo.svg',
+                color: 'green',
+                refresh: 10,
+              }
+            }
+            if (children[cardNo]) {
+              badge = {
+                text: children[cardNo].filter(function(child) {return child.done}).length
+                  + ' / ' + children[cardNo].length,
+                icon: './images/logo.svg',
+                color: 'green',
+                refresh: 10,
+              }
+            }
+            return badge
           },
         }]
       })
