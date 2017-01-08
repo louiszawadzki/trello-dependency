@@ -10,5 +10,6 @@
   },
   "globals": {
     "TrelloPowerUp": true,
+    "Promise": true,
   },
 }

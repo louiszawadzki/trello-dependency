@@ -10,19 +10,19 @@ var lists = {}
 TrelloPowerUp.initialize({
   'card-badges': function(t) {
     var cardId = ''
-    return t.card('id', 'url', 'labels', 'idList')
-      .then(function(card) {
-        // Add whether the list counts as done to the map of lists if it's not already there
-        if (!lists[card.idList]) {
-          lists[card.idList] = {done: false}
-          // Update whether done by checking list name
-          t.list('name')
-            .then(function(list) {
-              if (doneListRegex.test(list.name)) {
-                lists[card.idList].done = true
-              }
-            })
-        }
+    if (!Promise) {
+      // TODO load promise polyfill for crap like internet explorer
+      return null
+    }
+    return Promise.all([
+      t.card('id', 'url', 'labels', 'idList'),
+      t.list('name'),
+    ])
+      .then(function(context) {
+        var card = context[0]
+        var list = context[1]
+        // Update whether list counts as done by checking list name
+        lists[card.idList] = {done: doneListRegex.test(list.name)}
 
         cardId = card.id
         if (!cards[cardId]) {
@@ -32,6 +32,7 @@ TrelloPowerUp.initialize({
             labels: [],
           }
         }
+
         var oldLabels = cards[cardId].labels
         var currentLabels = card.labels.map(function(label) {return label.name})
         currentLabels
