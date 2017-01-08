@@ -1,5 +1,10 @@
 'use strict'
 
+if (!Promise) {
+  // load promise polyfill for crap like internet explorer
+  var Promise = TrelloPowerUp.Promise
+}
+
 var cardLabelRegex = /^#? ?(\d+)$/
 var doneListRegex = /(?:Done|done|DONE)/
 
@@ -11,10 +16,6 @@ var lists = {}
 TrelloPowerUp.initialize({
   'card-badges': function(t) {
     var cardId = ''
-    if (!Promise) {
-      // TODO load promise polyfill for crap like internet explorer
-      return null
-    }
     return Promise.all([
       t.card('id', 'url', 'labels', 'idList', 'name'),
       t.list('name'),
