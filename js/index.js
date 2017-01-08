@@ -56,7 +56,7 @@ TrelloPowerUp.initialize({
               }
 
               if (cardNumIdMap[cardNo]) {
-                cards[cardId].parent = cards[cardNumIdMap[cardNo]].name
+                cards[cardId].parent = cardNumIdMap[cardNo]
               }
             }
           })
@@ -81,7 +81,7 @@ TrelloPowerUp.initialize({
             }
             if (cards[cardId].parent) {
               badge = {
-                text: cards[cardId].parent,
+                text: cards[cards[cardId].parent].name,
                 icon: './images/logo.svg',
                 color: 'green',
                 refresh: 10,
