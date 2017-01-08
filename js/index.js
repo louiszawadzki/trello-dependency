@@ -67,6 +67,10 @@ TrelloPowerUp.initialize({
             if (match && match[1]) {
               var cardNo = match[1]
               children[cardNo] = children[cardNo].filter(function(child) {return child.id !== cardId})
+
+              if (cardNumIdMap[cardNo]) {
+                cards[cardId].parent = undefined
+              }
             }
           })
         cards[cardId].labels = currentLabels
