@@ -13,6 +13,40 @@ var cardNumIdMap = {}
 var children = {}
 var lists = {}
 
+function dynamicCardBadges(cardId) {
+  return [{
+    dynamic: function() {
+      var cardNo = cards[cardId].number
+      var badge = {
+        title: 'Card Number',
+        text: cardNo,
+        icon: './images/logo.svg',
+        refresh: 10,
+      }
+      if (cards[cardId].parent) {
+        badge = {
+          title: 'Dependency of',
+          text: cards[cards[cardId].parent].name,
+          icon: './images/logo.svg',
+          color: 'green',
+          refresh: 10,
+        }
+      }
+      if (children[cardNo]) {
+        badge = {
+          title: 'Dependent Cards',
+          text: children[cardNo].filter(function(child) {return child.done}).length
+            + ' / ' + children[cardNo].length,
+          icon: './images/logo.svg',
+          color: 'green',
+          refresh: 10,
+        }
+      }
+      return badge
+    },
+  }]
+}
+
 TrelloPowerUp.initialize({
   'card-badges': function(t) {
     var cardId = ''
@@ -76,34 +110,14 @@ TrelloPowerUp.initialize({
           })
         cards[cardId].labels = currentLabels
 
-        return [{
-          dynamic: function() {
-            var cardNo = cards[cardId].number
-            var badge = {
-              text: cardNo,
-              icon: './images/logo.svg',
-              refresh: 10,
-            }
-            if (cards[cardId].parent) {
-              badge = {
-                text: cards[cards[cardId].parent].name,
-                icon: './images/logo.svg',
-                color: 'green',
-                refresh: 10,
-              }
-            }
-            if (children[cardNo]) {
-              badge = {
-                text: children[cardNo].filter(function(child) {return child.done}).length
-                  + ' / ' + children[cardNo].length,
-                icon: './images/logo.svg',
-                color: 'green',
-                refresh: 10,
-              }
-            }
-            return badge
-          },
-        }]
+        return dynamicCardBadges(cardId)
+      })
+  },
+
+  'card-detail-badges': function(t) {
+    return t.card('id')
+      .then(function(card) {
+        return dynamicCardBadges(card.id)
       })
   },
 })
