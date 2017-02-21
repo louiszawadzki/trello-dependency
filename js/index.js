@@ -5,7 +5,7 @@ if (!Promise) {
   var Promise = TrelloPowerUp.Promise
 }
 
-var cardLabelRegex = /^#? ?(\d+)$/
+var cardLabelRegex = /^#? ?(\d+)/
 var doneListRegex = /(?:Done|done|DONE)/
 
 var cards = {}
