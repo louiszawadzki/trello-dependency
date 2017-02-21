@@ -4,7 +4,7 @@ A [Trello](trello.com) power-up to make visualisation and management of dependen
 
 ## How to use
 
-Trello Dependency uses card numbers to identify cards, and lists the numbers on the bottom of cards so that you can identify them. In order to link a card to another, add a label named after the first card's number (with an optional '#') to the second card. For example if card 103 is "Make dinner" and card 140 is "Buy dinner ingredients", you could add a label named '103' or '#103' to card 140. You'd then see a badge appear on card 140 with the name of the card it's linked to: "Make dinner". On 103 you'd see the count of related cards and how many are done. Any card in a list whose name contains the word 'done' is counted as done.
+Trello Dependency uses card numbers to identify cards, and lists the numbers on the bottom of cards so that you can identify them. In order to link a card to another, add a label starting with the first card's number (with an optional '#') to the second card. For example if card 103 is "Make dinner" and card 140 is "Buy dinner ingredients", you could add a label named '103', '#103' or '#103 dinner' to card 140. You'd then see a badge appear on card 140 with the name of the card it's linked to: "Make dinner". On 103 you'd see the count of related cards and how many are done. Any card in a list whose name contains the word 'done' is counted as done.
 
 ## Trying it out
 
