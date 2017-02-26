@@ -28,17 +28,19 @@ function dynamicCardBadges(cardId) {
           title: 'Dependency of',
           text: cards[cards[cardId].parent].name,
           icon: './images/logo.svg',
-          color: 'green',
           refresh: 10,
         }
       }
       if (children[cardNo]) {
+        var childrenDone = children[cardNo].filter(function(child) {return child.done}).length
+        var numChildren = children[cardNo].length
         badge = {
           title: 'Dependent Cards',
-          text: children[cardNo].filter(function(child) {return child.done}).length
-            + ' / ' + children[cardNo].length,
+          text: childrenDone + ' / ' + numChildren,
           icon: './images/logo.svg',
-          color: 'green',
+          color: childrenDone === 0 ? 'red' :
+            childrenDone === numChildren ? 'green' :
+            'yellow',
           refresh: 10,
         }
       }
