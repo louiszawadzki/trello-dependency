@@ -7,6 +7,7 @@ if (!Promise) {
 
 var cardLabelRegex = /^#? ?(\d+)/
 var doneListRegex = /(?:Done|done|DONE)/
+var cardPointsRegex = /^\((\d+)\)/
 
 var cards = {}
 var cardNumIdMap = {}
@@ -32,11 +33,14 @@ function dynamicCardBadges(cardId) {
         }
       }
       if (children[cardNo]) {
-        var childrenDone = children[cardNo].filter(function(child) {return child.done}).length
+        var doneChildCards = children[cardNo].filter(function(child) {return child.done})
+        var childrenDone = doneChildCards.length
         var numChildren = children[cardNo].length
+        var donePoints = doneChildCards.reduce(function(sum, child) {return sum + child.points}, 0)
+        var totalPoints = children[cardNo].reduce(function(sum, child) {return sum + child.points}, 0)
         badge = {
           title: 'Dependent Cards',
-          text: childrenDone + ' / ' + numChildren,
+          text: '(' + childrenDone + ' / ' + numChildren + ') points: (' + donePoints + ' / ' + totalPoints + ')',
           icon: './images/logo.svg',
           color: childrenDone === 0 ? 'red' :
             childrenDone === numChildren ? 'green' :
@@ -80,14 +84,22 @@ TrelloPowerUp.initialize({
           .map(function(label) {return cardLabelRegex.exec(label)})
           .forEach(function(match) {
             if (match && match[1]) {
+              // Label matches regex for linking card dependencies
               var cardNo = match[1]
+
+              var pointsMatch = cardPointsRegex.exec(card.name)
+              var points = pointsMatch ? parseInt(pointsMatch[1], 10) : 0
+
               if (oldLabels.indexOf(match.input) === -1) {
-                var newChild = {id: cardId, done: lists[card.idList].done}
+                // We've only just added the label to this card
+                var newChild = {id: cardId, done: lists[card.idList].done, points: points}
                 children[cardNo] = children[cardNo] ? children[cardNo].concat([newChild]) : [newChild]
               } else {
+                // We already know about this dependency, maybe we need to update if it's done and points
                 children[cardNo].forEach(function(child) {
                   if (child.id === cardId) {
                     child.done = lists[card.idList].done
+                    child.points = points
                   }
                 })
               }
