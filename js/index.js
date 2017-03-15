@@ -14,43 +14,86 @@ var cardNumIdMap = {}
 var children = {}
 var lists = {}
 
+function cardNoBadge(cardNo) {
+  return {
+    title: 'Card Number',
+    text: cardNo,
+    icon: './images/logo.svg',
+    refresh: 10,
+  }
+}
+
+function depOfBadge(cardId) {
+  return {
+    title: 'Dependency of',
+    text: cards[cards[cardId].parent].name,
+    icon: './images/logo.svg',
+    refresh: 10,
+  }
+}
+
+function cardCounterBadge(childrenDone, numChildren) {
+  return {
+    title: 'Dependent Cards',
+    text: '(' + childrenDone + ' / ' + numChildren + ')',
+    icon: './images/logo.svg',
+    color: childrenDone === 0 ? 'red' :
+      childrenDone === numChildren ? 'green' :
+      'yellow',
+    refresh: 10,
+  }
+}
+
+function pointsCounterBadge(donePoints, totalPoints) {
+  return {
+    title: 'Points Done of Total',
+    text: '(' + donePoints + ' / ' + totalPoints + ')',
+    icon: './images/logo.svg',
+    color: donePoints === 0 ? 'red' :
+      donePoints === totalPoints ? 'green' :
+      'yellow',
+    refresh: 10,
+  }
+}
+
 function dynamicCardBadges(cardId) {
   return [{
     dynamic: function() {
       var cardNo = cards[cardId].number
-      var badge = {
-        title: 'Card Number',
-        text: cardNo,
-        icon: './images/logo.svg',
-        refresh: 10,
-      }
+      var badge = cardNoBadge(cardNo)
       if (cards[cardId].parent) {
-        badge = {
-          title: 'Dependency of',
-          text: cards[cards[cardId].parent].name,
-          icon: './images/logo.svg',
-          refresh: 10,
-        }
+        badge = depOfBadge(cardId)
       }
       if (children[cardNo]) {
         var doneChildCards = children[cardNo].filter(function(child) {return child.done})
         var childrenDone = doneChildCards.length
         var numChildren = children[cardNo].length
-        var donePoints = doneChildCards.reduce(function(sum, child) {return sum + child.points}, 0)
-        var totalPoints = children[cardNo].reduce(function(sum, child) {return sum + child.points}, 0)
-        badge = {
-          title: 'Dependent Cards',
-          text: '(' + childrenDone + ' / ' + numChildren + ') points: (' + donePoints + ' / ' + totalPoints + ')',
-          icon: './images/logo.svg',
-          color: childrenDone === 0 ? 'red' :
-            childrenDone === numChildren ? 'green' :
-            'yellow',
-          refresh: 10,
-        }
+        badge = cardCounterBadge(childrenDone, numChildren)
       }
       return badge
     },
   }]
+}
+
+function staticCardBadges(cardId) {
+  var cardNo = cards[cardId].number
+  var badges = [cardNoBadge(cardNo)]
+  if (cards[cardId].parent) {
+    badges.push(depOfBadge(cardId))
+  }
+  if (children[cardNo]) {
+    var doneChildCards = children[cardNo].filter(function(child) {return child.done})
+    var childrenDone = doneChildCards.length
+    var numChildren = children[cardNo].length
+    var donePoints = doneChildCards.reduce(function(sum, child) {return sum + child.points}, 0)
+    var totalPoints = children[cardNo].reduce(function(sum, child) {return sum + child.points}, 0)
+    badges = badges.concat([
+      cardCounterBadge(childrenDone, numChildren),
+      pointsCounterBadge(donePoints, totalPoints),
+    ])
+  }
+
+  return badges
 }
 
 TrelloPowerUp.initialize({
@@ -131,7 +174,7 @@ TrelloPowerUp.initialize({
   'card-detail-badges': function(t) {
     return t.card('id')
       .then(function(card) {
-        return dynamicCardBadges(card.id)
+        return staticCardBadges(card.id)
       })
   },
 })
